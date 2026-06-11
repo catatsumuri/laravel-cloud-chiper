@@ -7,6 +7,12 @@ Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    Route::get('chirps/{chirp}/attachments/{attachment}/thumbnail', [ChirpController::class, 'attachmentThumbnail'])
+        ->whereNumber('attachment')
+        ->name('chirps.attachments.thumbnail');
+    Route::get('chirps/{chirp}/attachments/{attachment}', [ChirpController::class, 'attachment'])
+        ->whereNumber('attachment')
+        ->name('chirps.attachments.show');
     Route::resource('chirps', ChirpController::class)->only(['index', 'store', 'update', 'destroy']);
 });
 

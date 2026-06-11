@@ -16,6 +16,7 @@ class ChirpFactory extends Factory
         return [
             'user_id' => User::factory(),
             'message' => fake()->sentence(),
+            'attachments' => null,
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\File;
 
 class StoreChirpRequest extends FormRequest
 {
@@ -19,8 +20,18 @@ class StoreChirpRequest extends FormRequest
      */
     public function rules(): array
     {
+        if ($this->isMethod('patch')) {
+            return [
+                'message' => ['required', 'string', 'max:255'],
+            ];
+        }
+
         return [
-            'message' => ['required', 'string', 'max:255'],
+            'message' => ['nullable', 'required_without:attachments', 'string', 'max:255'],
+            'attachments' => ['nullable', 'array', 'max:4'],
+            'attachments.*' => [
+                File::image()->max(10240),
+            ],
         ];
     }
 }
