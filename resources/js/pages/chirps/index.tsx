@@ -33,7 +33,10 @@ export default function ChirpsIndex({ chirps }: { chirps: Chirp[] }) {
             <h1 className="sr-only">Chirps</h1>
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-x-auto p-4">
-                <Heading title="Chirps" description="Share what's on your mind" />
+                <Heading
+                    title="Chirps"
+                    description="Share what's on your mind"
+                />
 
                 <Form
                     {...ChirpController.store.form()}
@@ -70,7 +73,9 @@ export default function ChirpsIndex({ chirps }: { chirps: Chirp[] }) {
                                             {chirp.user.name}
                                         </p>
                                         <p className="text-xs text-muted-foreground">
-                                            {new Date(chirp.created_at).toLocaleString()}
+                                            {new Date(
+                                                chirp.created_at,
+                                            ).toLocaleString()}
                                         </p>
                                         <p className="mt-2 text-sm">
                                             {chirp.message}
@@ -79,7 +84,9 @@ export default function ChirpsIndex({ chirps }: { chirps: Chirp[] }) {
 
                                     {chirp.user.id === auth.user.id && (
                                         <Form
-                                            {...ChirpController.destroy.form(chirp.id)}
+                                            {...ChirpController.destroy.form(
+                                                chirp.id,
+                                            )}
                                         >
                                             {({ processing }) => (
                                                 <Button
