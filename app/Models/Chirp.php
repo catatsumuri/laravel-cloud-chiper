@@ -24,7 +24,7 @@ class Chirp extends Model
     use HasFactory;
 
     /**
-     * @return BelongsTo<User, Chirp>
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {

@@ -38,7 +38,7 @@ class User extends Authenticatable implements PasskeyUser
     use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
     /**
-     * @return HasMany<Chirp, User>
+     * @return HasMany<Chirp, $this>
      */
     public function chirps(): HasMany
     {
