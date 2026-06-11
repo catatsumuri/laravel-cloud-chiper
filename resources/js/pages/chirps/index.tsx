@@ -4,6 +4,15 @@ import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { index } from '@/routes/chirps';
@@ -83,22 +92,53 @@ export default function ChirpsIndex({ chirps }: { chirps: Chirp[] }) {
                                     </div>
 
                                     {chirp.user.id === auth.user.id && (
-                                        <Form
-                                            {...ChirpController.destroy.form(
-                                                chirp.id,
-                                            )}
-                                        >
-                                            {({ processing }) => (
+                                        <Dialog>
+                                            <DialogTrigger asChild>
                                                 <Button
-                                                    type="submit"
                                                     variant="destructive"
                                                     size="sm"
-                                                    disabled={processing}
                                                 >
                                                     Delete
                                                 </Button>
-                                            )}
-                                        </Form>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                                <DialogTitle>
+                                                    Delete this chirp?
+                                                </DialogTitle>
+                                                <DialogDescription>
+                                                    This action cannot be
+                                                    undone.
+                                                </DialogDescription>
+                                                <Form
+                                                    {...ChirpController.destroy.form(
+                                                        chirp.id,
+                                                    )}
+                                                >
+                                                    {({ processing }) => (
+                                                        <DialogFooter className="gap-2">
+                                                            <DialogClose
+                                                                asChild
+                                                            >
+                                                                <Button variant="secondary">
+                                                                    Cancel
+                                                                </Button>
+                                                            </DialogClose>
+                                                            <Button
+                                                                variant="destructive"
+                                                                disabled={
+                                                                    processing
+                                                                }
+                                                                asChild
+                                                            >
+                                                                <button type="submit">
+                                                                    Delete
+                                                                </button>
+                                                            </Button>
+                                                        </DialogFooter>
+                                                    )}
+                                                </Form>
+                                            </DialogContent>
+                                        </Dialog>
                                     )}
                                 </div>
                             </CardContent>
