@@ -135,7 +135,7 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 # Test Enforcement
 
 - Every change must be programmatically tested. Write a new test or update an existing test, then run the affected tests to make sure they pass.
-- Run the minimum number of tests needed to ensure code quality and speed. Use `vendor/bin/sail artisan test --compact` with a specific filename or filter.
+- Run the minimum number of tests needed to ensure code quality and speed. Use `vendor/bin/sail composer test` for full verification, or `vendor/bin/sail artisan test --compact` with a specific filename or filter when you only need the feature tests.
 
 === inertia-laravel/core rules ===
 
