@@ -23,6 +23,9 @@ class Chirp extends Model
     /** @use HasFactory<ChirpFactory> */
     use HasFactory;
 
+    /**
+     * @return BelongsTo<User, Chirp>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -37,6 +37,9 @@ class User extends Authenticatable implements PasskeyUser
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, PasskeyAuthenticatable, TwoFactorAuthenticatable;
 
+    /**
+     * @return HasMany<Chirp, User>
+     */
     public function chirps(): HasMany
     {
         return $this->hasMany(Chirp::class);
