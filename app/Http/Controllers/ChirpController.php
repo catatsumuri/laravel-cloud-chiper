@@ -30,6 +30,15 @@ class ChirpController extends Controller
         return to_route('chirps.index');
     }
 
+    public function update(StoreChirpRequest $request, Chirp $chirp): RedirectResponse
+    {
+        Gate::authorize('update', $chirp);
+
+        $chirp->update($request->validated());
+
+        return to_route('chirps.index');
+    }
+
     public function destroy(Request $request, Chirp $chirp): RedirectResponse
     {
         Gate::authorize('delete', $chirp);

@@ -7,7 +7,7 @@ Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'dashboard')->name('dashboard');
-    Route::resource('chirps', ChirpController::class)->only(['index', 'store', 'destroy']);
+    Route::resource('chirps', ChirpController::class)->only(['index', 'store', 'update', 'destroy']);
 });
 
 require __DIR__.'/settings.php';

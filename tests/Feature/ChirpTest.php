@@ -45,6 +45,51 @@ test('chirp message cannot exceed 255 characters', function () {
         ->assertSessionHasErrors('message');
 });
 
+test('users can update their own chirps', function () {
+    $user = User::factory()->create();
+    $chirp = Chirp::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->patch(route('chirps.update', $chirp), ['message' => 'Updated message'])
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('chirps.index'));
+
+    expect($chirp->fresh())->message->toBe('Updated message');
+});
+
+test('users cannot update chirps belonging to other users', function () {
+    $user = User::factory()->create();
+    $otherChirp = Chirp::factory()->create();
+
+    $this->actingAs($user)
+        ->patch(route('chirps.update', $otherChirp), ['message' => 'Hacked'])
+        ->assertForbidden();
+
+    expect($otherChirp->fresh())->message->not->toBe('Hacked');
+});
+
+test('updated chirp message is required', function () {
+    $user = User::factory()->create();
+    $chirp = Chirp::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->patch(route('chirps.update', $chirp), ['message' => ''])
+        ->assertSessionHasErrors('message');
+
+    expect($chirp->fresh())->message->toBe($chirp->message);
+});
+
+test('updated chirp message cannot exceed 255 characters', function () {
+    $user = User::factory()->create();
+    $chirp = Chirp::factory()->create(['user_id' => $user->id]);
+
+    $this->actingAs($user)
+        ->patch(route('chirps.update', $chirp), ['message' => str_repeat('a', 256)])
+        ->assertSessionHasErrors('message');
+
+    expect($chirp->fresh())->message->toBe($chirp->message);
+});
+
 test('users can delete their own chirps', function () {
     $user = User::factory()->create();
     $chirp = Chirp::factory()->create(['user_id' => $user->id]);
