@@ -59,22 +59,31 @@ class ExtractChirpAttachmentMetadata implements ShouldQueue
     {
         $path = $attachment['path'] ?? null;
 
-        if (! is_string($path) || ! Storage::disk('public')->exists($path)) {
+        if (! is_string($path) || ! Storage::exists($path)) {
             return $attachment;
         }
 
-        $absolutePath = Storage::disk('public')->path($path);
-        $imageSize = @getimagesize($absolutePath);
+        $temporaryPath = $this->temporaryPathFor($path);
+
+        if ($temporaryPath === null) {
+            return $attachment;
+        }
+
+        $imageSize = @getimagesize($temporaryPath);
 
         if ($imageSize === false) {
+            @unlink($temporaryPath);
+
             return $attachment;
         }
 
         [$width, $height] = $imageSize;
         $fileSize = $this->integerValue(
-            $attachment['size'] ?? Storage::disk('public')->size($path),
+            $attachment['size'] ?? Storage::size($path),
         );
-        $exifData = $this->exifDataFor($absolutePath);
+        $exifData = $this->exifDataFor($temporaryPath);
+
+        @unlink($temporaryPath);
 
         return [
             ...$attachment,
@@ -94,6 +103,38 @@ class ExtractChirpAttachmentMetadata implements ShouldQueue
                 'location' => $this->locationFor($exifData),
             ],
         ];
+    }
+
+    private function temporaryPathFor(string $path): ?string
+    {
+        $readStream = Storage::readStream($path);
+
+        if (! is_resource($readStream)) {
+            return null;
+        }
+
+        $temporaryPath = tempnam(sys_get_temp_dir(), 'chirp-attachment-');
+
+        if ($temporaryPath === false) {
+            fclose($readStream);
+
+            return null;
+        }
+
+        $writeStream = fopen($temporaryPath, 'wb');
+
+        if ($writeStream === false) {
+            fclose($readStream);
+            @unlink($temporaryPath);
+
+            return null;
+        }
+
+        stream_copy_to_stream($readStream, $writeStream);
+        fclose($readStream);
+        fclose($writeStream);
+
+        return $temporaryPath;
     }
 
     /**

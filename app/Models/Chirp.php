@@ -34,7 +34,7 @@ class Chirp extends Model
                 ->all();
 
             if ($paths !== []) {
-                Storage::disk('public')->delete($paths);
+                Storage::delete($paths);
             }
         });
     }

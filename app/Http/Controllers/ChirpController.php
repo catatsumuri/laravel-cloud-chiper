@@ -35,7 +35,7 @@ class ChirpController extends Controller
 
         $attachments = collect($request->file('attachments', []))
             ->map(function (UploadedFile $attachment, int $index) use ($chirp): array {
-                $path = $attachment->store("chirps/{$chirp->id}", 'public');
+                $path = $attachment->store("chirps/{$chirp->id}");
 
                 return [
                     'name' => $attachment->getClientOriginalName(),
@@ -109,7 +109,7 @@ class ChirpController extends Controller
     {
         $path = $attachmentData['path'] ?? null;
 
-        abort_unless(is_string($path) && Storage::disk('public')->exists($path), 404);
+        abort_unless(is_string($path) && Storage::exists($path), 404);
 
         $name = is_string($attachmentData['name'] ?? null)
             ? $attachmentData['name']
@@ -118,7 +118,7 @@ class ChirpController extends Controller
         $mime = $attachmentData['mime'] ?? null;
         $headers = is_string($mime) ? ['Content-Type' => $mime] : [];
 
-        return Storage::disk('public')->response($path, $name, $headers);
+        return Storage::response($path, $name, $headers);
     }
 
     public function destroy(Request $request, Chirp $chirp): RedirectResponse

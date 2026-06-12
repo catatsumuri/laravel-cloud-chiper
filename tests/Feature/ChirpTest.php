@@ -34,7 +34,7 @@ test('authenticated users can post a chirp', function () {
 });
 
 test('authenticated users can attach images to a chirp', function () {
-    Storage::fake('public');
+    Storage::fake(config('filesystems.default'));
     $user = User::factory()->create();
     $file = UploadedFile::fake()->image('photo.jpg');
     Queue::fake();
@@ -58,7 +58,7 @@ test('authenticated users can attach images to a chirp', function () {
         ->and($attachment['mime'])->toBe('image/jpeg')
         ->and($attachment['size'])->toBe($file->getSize());
 
-    Storage::disk('public')->assertExists($attachment['path']);
+    Storage::assertExists($attachment['path']);
 
     Queue::assertPushed(
         ExtractChirpAttachmentMetadata::class,
@@ -67,10 +67,10 @@ test('authenticated users can attach images to a chirp', function () {
 });
 
 test('chirp attachment metadata is extracted by a queued job', function () {
-    Storage::fake('public');
+    Storage::fake(config('filesystems.default'));
     $user = User::factory()->create();
     $file = UploadedFile::fake()->image('photo.jpg', 640, 480);
-    $path = $file->store('chirps/1', 'public');
+    $path = $file->store('chirps/1');
 
     $chirp = Chirp::factory()->create([
         'user_id' => $user->id,
@@ -102,7 +102,7 @@ test('chirp attachment metadata is extracted by a queued job', function () {
 });
 
 test('authenticated users can post a chirp with only an image', function () {
-    Storage::fake('public');
+    Storage::fake(config('filesystems.default'));
     $user = User::factory()->create();
     $file = UploadedFile::fake()->image('photo.jpg');
 
@@ -121,9 +121,9 @@ test('authenticated users can post a chirp with only an image', function () {
 });
 
 test('chirp attachments are served through an authenticated endpoint', function () {
-    Storage::fake('public');
+    Storage::fake(config('filesystems.default'));
     $user = User::factory()->create();
-    Storage::disk('public')->put('chirps/1/photo.jpg', 'image');
+    Storage::put('chirps/1/photo.jpg', 'image');
 
     $chirp = Chirp::factory()->create([
         'attachments' => [
@@ -149,9 +149,9 @@ test('chirp attachments are served through an authenticated endpoint', function 
 });
 
 test('chirp attachment thumbnails are served through an authenticated endpoint', function () {
-    Storage::fake('public');
+    Storage::fake(config('filesystems.default'));
     $user = User::factory()->create();
-    Storage::disk('public')->put('chirps/1/photo.jpg', 'image');
+    Storage::put('chirps/1/photo.jpg', 'image');
 
     $chirp = Chirp::factory()->create([
         'attachments' => [
@@ -186,7 +186,7 @@ test('missing chirp attachments return not found', function () {
 });
 
 test('chirp attachments must be images', function () {
-    Storage::fake('public');
+    Storage::fake(config('filesystems.default'));
     $user = User::factory()->create();
 
     $this->actingAs($user)
@@ -275,9 +275,9 @@ test('users can delete their own chirps', function () {
 });
 
 test('deleting a chirp removes its attachments', function () {
-    Storage::fake('public');
+    Storage::fake(config('filesystems.default'));
     $user = User::factory()->create();
-    Storage::disk('public')->put('chirps/1/photo.jpg', 'image');
+    Storage::put('chirps/1/photo.jpg', 'image');
 
     $chirp = Chirp::factory()->create([
         'user_id' => $user->id,
@@ -298,7 +298,7 @@ test('deleting a chirp removes its attachments', function () {
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('chirps.index'));
 
-    Storage::disk('public')->assertMissing('chirps/1/photo.jpg');
+    Storage::assertMissing('chirps/1/photo.jpg');
 });
 
 test('users cannot delete chirps belonging to other users', function () {
